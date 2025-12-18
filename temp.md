@@ -1,5 +1,9 @@
 # 2025-01 컴퓨터소프트웨어캡스톤PBL 기말고사 문제 정리 (17~24)
 
+> 🔴 **빨간 주석**: 출제 가능성 높은 핵심 포인트
+> 
+> ⭐ **별표**: 빈칸 출제 예상 지점
+
 ---
 
 ## 17. 클러스터 업그레이드 (이분 탐색)
@@ -56,29 +60,31 @@ def test(x):
     cost = 0
     for i in range(n):
         if a[i] < x:
-            cost += (x - a[i]) * (x - a[i])  # (a)
-    return cost <= b
+            cost += (x - a[i]) * (x - a[i])  # ⭐(a) 비용 계산: 제곱!
+    return cost <= b  # 🔴 판별 함수의 반환값
 
-low, high = 1, 2 * 10**9  # (b)
+low, high = 1, 2 * 10**9  # ⭐(b) 탐색 범위 설정
 
 while low < high:
-    mid = (low + high + 1) // 2  # (c) 상향 이분 탐색
+    mid = (low + high + 1) // 2  # ⭐(c) 상향 이분탐색: +1 필수!
     if test(mid):
-        low = mid   # (d)
+        low = mid   # ⭐(d) 가능하면 더 큰 값 탐색
     else:
-        high = mid - 1  # (e)
+        high = mid - 1  # ⭐(e) 불가능하면 범위 축소
 
 print(low)
 ```
 
-### 빈칸 정답
-| 빈칸 | 정답 |
-|------|------|
-| (a) | `(x - a[i]) * (x - a[i])` |
-| (b) | `1, 2 * 10**9` |
-| (c) | `(low + high + 1) // 2` |
-| (d) | `mid` |
-| (e) | `mid - 1` |
+### 🔴 출제 포인트
+| 빈칸 | 정답 | 출제 포인트 |
+|------|------|-------------|
+| ⭐(a) | `(x - a[i]) * (x - a[i])` | **제곱 비용 계산** |
+| ⭐(b) | `1, 2 * 10**9` | **탐색 범위 설정** |
+| ⭐(c) | `(low + high + 1) // 2` | **상향 이분탐색 +1** |
+| ⭐(d) | `mid` | **조건 만족시 low 갱신** |
+| ⭐(e) | `mid - 1` | **조건 불만족시 high 갱신** |
+
+> 🔴 **핵심 암기**: 최대값 찾기 = `(low + high + 1) // 2` + `low = mid`
 
 ---
 
@@ -130,13 +136,23 @@ total = 0
 for i in range(n):
     for k in range(i + 1, n):
         if a[i] < a[k]:
-            more[i][k] = more[i][k - 1] + 1
+            more[i][k] = more[i][k - 1] + 1  # ⭐ a[i] < a[k]면 j 후보 추가
         else:
-            more[i][k] = more[i][k - 1]
-            total += more[i][k - 1]  # a[k] < a[i] < a[j] 조건 충족
+            more[i][k] = more[i][k - 1]      # 🔴 그대로 유지
+            # ⭐⭐ 핵심! a[i] > a[k]일 때만 카운트
+            total += more[i][k - 1]  # 🔴 a[k] < a[i] < a[j] 조건 충족
 
 print(total)
 ```
+
+### 🔴 출제 포인트
+| 위치 | 출제 예상 | 설명 |
+|------|-----------|------|
+| ⭐ `more[i][k - 1] + 1` | **DP 점화식** | a[i] < a[k]면 j 후보 1개 추가 |
+| ⭐ `more[i][k - 1]` | **DP 점화식** | a[i] >= a[k]면 개수 유지 |
+| ⭐⭐ `total += more[i][k - 1]` | **카운팅 조건** | a[i] > a[k]일 때만! |
+
+> 🔴 **핵심 암기**: 231 패턴 = a[k] < a[i] < a[j] (값 기준으로 "작 < 중 < 큰"이 **아닌** 경우)
 
 ---
 
@@ -184,26 +200,39 @@ $$O(h \times 2^h \times k)$$
 def merge(list1, list2):
     lst = []
     for i in range(len(list1)):
-        lst.append(list1[i])
-        lst.append(list2[i])
+        lst.append(list1[i])  # ⭐ 번갈아 합치기
+        lst.append(list2[i])  # ⭐ 번갈아 합치기
     return lst
 
 h, k, r = map(int, input().split())
 tasks = []
-for _ in range(2**h):
+for _ in range(2**h):  # 🔴 말단 직원 수 = 2^h
     tasks.append(list(map(int, input().split())))
 
-for i in range(1, h + 1):
+for i in range(1, h + 1):  # 🔴 레벨 1부터 h까지
     tasks2 = []
-    for j in range(2**(h - i)):
-        if i % 2:  # 홀수 레벨
+    for j in range(2**(h - i)):  # ⭐ 현재 레벨 노드 수 = 2^(h-i)
+        if i % 2:  # ⭐⭐ 홀수 레벨: 오른쪽 먼저 (= 왼쪽이 먼저 처리됨)
             tasks2.append(merge(tasks[2*j + 1], tasks[2*j]))
-        else:      # 짝수 레벨
+        else:      # ⭐⭐ 짝수 레벨: 왼쪽 먼저
             tasks2.append(merge(tasks[2*j], tasks[2*j + 1]))
     tasks = tasks2
 
-print(sum(tasks[0][:r - h]))
+print(sum(tasks[0][:r - h]))  # ⭐⭐⭐ 핵심! r-h개만 합산
 ```
+
+### 🔴 출제 포인트
+| 위치 | 출제 예상 | 설명 |
+|------|-----------|------|
+| ⭐ `2**h` | **말단 직원 수** | 완전이진트리 |
+| ⭐ `2**(h - i)` | **레벨별 노드 수** | |
+| ⭐⭐ `i % 2` | **홀짝 분기** | 홀수/짝수 날 처리 순서 |
+| ⭐⭐ `tasks[2*j + 1], tasks[2*j]` | **merge 순서** | 홀수 레벨 |
+| ⭐⭐⭐ `r - h` | **완료 업무 개수** | 말단→부서장 h+1일 소요 |
+
+> 🔴 **핵심 암기**: 
+> - r일까지 완료된 업무 = **r - h**개 (1일차 시작 → h+1일차 완료)
+> - 홀수 레벨 merge: `merge(right, left)` → 실제론 left 먼저 처리
 
 ---
 
@@ -252,20 +281,20 @@ def computeRanking(arr):
     ans = [0] * n
     
     for i in range(n):
-        arr[i] = [arr[i], i]
+        arr[i] = [arr[i], i]  # ⭐ [점수, 원래인덱스] 변환
     
-    arr.sort(reverse=True)
+    arr.sort(reverse=True)  # 🔴 내림차순 정렬 (높은 점수 먼저)
     
     cnt = 1
-    ranking[0] = 1
+    ranking[0] = 1  # 🔴 1등은 무조건 1
     
     for i in range(1, n):
-        if arr[i][0] != arr[i-1][0]:
-            cnt = i + 1
+        if arr[i][0] != arr[i-1][0]:  # ⭐⭐ 동점 아니면
+            cnt = i + 1  # ⭐⭐ 등수 = 현재 순위 (1, 2, 2, 4 형태)
         ranking[i] = cnt
     
     for i in range(n):
-        ans[arr[i][1]] = ranking[i]
+        ans[arr[i][1]] = ranking[i]  # ⭐ 원래 인덱스로 복원
     
     for i in range(n):
         print(ans[i], end=' ')
@@ -281,6 +310,16 @@ for _ in range(3):
 
 computeRanking(total)
 ```
+
+### 🔴 출제 포인트
+| 위치 | 출제 예상 | 설명 |
+|------|-----------|------|
+| ⭐ `[arr[i], i]` | **인덱스 보존** | 정렬 후 복원 위해 |
+| 🔴 `reverse=True` | **내림차순** | 높은 점수 = 높은 등수 |
+| ⭐⭐ `cnt = i + 1` | **동점 처리** | 공동 2등 다음은 4등 |
+| ⭐ `ans[arr[i][1]]` | **원래 순서 복원** | |
+
+> 🔴 **핵심 암기**: 동점이면 등수 유지, 동점 끝나면 **현재 인덱스+1**로 점프
 
 ---
 
@@ -327,61 +366,74 @@ $$O(3^n + 2^n \times m)$$
 n, m = map(int, input().split())
 dna = [list(input()) for _ in range(n)]
 
-superDNA = [None for _ in range(2**n)]
-superDNA[0] = ['.'] * m
+superDNA = [None for _ in range(2**n)]  # 🔴 2^n개 부분집합
+superDNA[0] = ['.'] * m  # ⭐ 공집합 = 모두 와일드카드
 
 def merge(dna1, dna2):
     if dna1 == [] or dna2 == []:
-        return []
+        return []  # 🔴 이미 불가능한 경우
     result = []
     for i in range(m):
         if dna1[i] == '.':
-            result.append(dna2[i])
+            result.append(dna2[i])      # ⭐ '.' + X = X
         elif dna2[i] == '.':
-            result.append(dna1[i])
+            result.append(dna1[i])      # ⭐ X + '.' = X
         elif dna1[i] == dna2[i]:
-            result.append(dna1[i])
+            result.append(dna1[i])      # ⭐ X + X = X
         else:
-            return []
+            return []  # ⭐⭐ 충돌! 다른 문자 = 병합 불가
     return result
 
 def genSuperDNA(index):
     loc = 0
     tempIndex = index
-    while tempIndex % 2 == 0:
+    while tempIndex % 2 == 0:  # ⭐⭐ 가장 오른쪽 1비트 찾기
         tempIndex //= 2
         loc += 1
-    superDNA[index] = merge(dna[loc], superDNA[index - 2**loc])
+    superDNA[index] = merge(dna[loc], superDNA[index - 2**loc])  # ⭐⭐ 증분적 계산
 
 for i in range(1, 2**n):
     genSuperDNA(i)
 
-answer = [n + 1] * (2**n)
-answer[0] = 0
+answer = [n + 1] * (2**n)  # 🔴 불가능 = 큰 값
+answer[0] = 0  # ⭐ 공집합 = 0개 필요
 
 def genAnswer(index):
     if answer[index] < n + 1:
-        return answer[index]
+        return answer[index]  # 🔴 메모이제이션
     minVal = n + 1
     sub = index
     while sub > 0:
-        other = index ^ sub
+        other = index ^ sub  # ⭐⭐ XOR로 나머지 집합
         if other > 0:
             val = genAnswer(sub) + genAnswer(other)
             if val < minVal:
                 minVal = val
-        sub = (sub - 1) & index
+        sub = (sub - 1) & index  # ⭐⭐⭐ 부분집합 열거 트릭!
     answer[index] = minVal
     return minVal
 
 for i in range(1, 2**n):
     if superDNA[i] != []:
-        answer[i] = 1
+        answer[i] = 1  # 🔴 하나로 커버 가능 = 1
     else:
         genAnswer(i)
 
-print(answer[2**n - 1])
+print(answer[2**n - 1])  # ⭐⭐ 전체 집합 = 2^n - 1
 ```
+
+### 🔴 출제 포인트
+| 위치 | 출제 예상 | 설명 |
+|------|-----------|------|
+| ⭐ merge 함수 전체 | **병합 규칙** | `.` 처리, 충돌 처리 |
+| ⭐⭐ `tempIndex % 2 == 0` | **오른쪽 1비트 찾기** | |
+| ⭐⭐ `index ^ sub` | **XOR 연산** | 나머지 집합 계산 |
+| ⭐⭐⭐ `(sub - 1) & index` | **부분집합 열거** | 핵심 비트 트릭! |
+| ⭐⭐ `2**n - 1` | **전체 집합** | 모든 비트 1 |
+
+> 🔴 **핵심 암기**: 
+> - 부분집합 열거: `sub = (sub - 1) & index`
+> - 전체 집합 비트마스크: `2^n - 1` = `0b111...1` (n개의 1)
 
 ---
 
@@ -427,17 +479,17 @@ $$O(N + M)$$
 ### 정답 코드
 ```python
 import sys
-sys.setrecursionlimit(10**7)
+sys.setrecursionlimit(10**7)  # 🔴 재귀 제한 해제 필수!
 
 n, m = map(int, input().split())
 
-adj = [[] for _ in range(n + 1)]
-adjR = [[] for _ in range(n + 1)]
+adj = [[] for _ in range(n + 1)]   # 정방향
+adjR = [[] for _ in range(n + 1)]  # ⭐ 역방향 그래프
 
 for _ in range(m):
     x, y = map(int, input().split())
-    adj[x].append(y)
-    adjR[y].append(x)
+    adj[x].append(y)   # 정방향: x → y
+    adjR[y].append(x)  # ⭐⭐ 역방향: y → x (간선 뒤집기)
 
 s, t = map(int, input().split())
 
@@ -448,27 +500,47 @@ def dfs(now, graph, visited):
     for neighbor in graph[now]:
         dfs(neighbor, graph, visited)
 
+# ⭐⭐⭐ 출근길: S→v (T 차단), v→T (역방향)
 fromS = [0] * (n + 1)
-fromS[t] = 1  # T 차단
+fromS[t] = 1  # ⭐⭐ T를 미리 방문 처리 → T 이후 탐색 차단!
 dfs(s, adj, fromS)
 
+# ⭐⭐⭐ 퇴근길: T→v (S 차단), v→S (역방향)
 fromT = [0] * (n + 1)
-fromT[s] = 1  # S 차단
+fromT[s] = 1  # ⭐⭐ S를 미리 방문 처리 → S 이후 탐색 차단!
 dfs(t, adj, fromT)
 
+# ⭐ 역방향 DFS: v→S 가능 여부
 RfromS = [0] * (n + 1)
-dfs(s, adjR, RfromS)
+dfs(s, adjR, RfromS)  # 🔴 역방향 그래프 사용!
 
+# ⭐ 역방향 DFS: v→T 가능 여부
 RfromT = [0] * (n + 1)
-dfs(t, adjR, RfromT)
+dfs(t, adjR, RfromT)  # 🔴 역방향 그래프 사용!
 
 count = 0
 for i in range(1, n + 1):
+    # ⭐⭐⭐ 4가지 조건 모두 만족
     if fromS[i] == 1 and fromT[i] == 1 and RfromS[i] == 1 and RfromT[i] == 1:
         count += 1
 
-print(count - 2)  # S, T 제외
+print(count - 2)  # ⭐⭐ S, T 제외하므로 -2
 ```
+
+### 🔴 출제 포인트
+| 위치 | 출제 예상 | 설명 |
+|------|-----------|------|
+| ⭐⭐ `adjR[y].append(x)` | **역방향 그래프** | 간선 방향 뒤집기 |
+| ⭐⭐ `fromS[t] = 1` | **T 차단** | T 도착 후 더 이상 안 감 |
+| ⭐⭐ `fromT[s] = 1` | **S 차단** | S 도착 후 더 이상 안 감 |
+| 🔴 `dfs(s, adjR, ...)` | **역방향 DFS** | v→S 가능 여부 |
+| ⭐⭐ 4가지 AND 조건 | **최종 판별** | |
+| ⭐⭐ `count - 2` | **S, T 제외** | |
+
+> 🔴 **핵심 암기**: 
+> - "v에서 X로 도달 가능" = **역방향 그래프에서 X부터 DFS**
+> - T 차단: `fromS[t] = 1` (미리 방문 처리)
+> - 최종 답: **4가지 조건 AND** 후 **-2** (S, T 제외)
 
 ---
 
@@ -513,19 +585,33 @@ import bisect
 
 n, q = map(int, input().split())
 mileage = list(map(int, input().split()))
-mileage.sort()
+mileage.sort()  # 🔴 정렬 필수!
 
 for _ in range(q):
     m = int(input())
-    idx = bisect.bisect_left(mileage, m)
+    idx = bisect.bisect_left(mileage, m)  # ⭐⭐ m의 왼쪽 경계 = m보다 작은 개수
     
+    # ⭐⭐⭐ m이 실제로 존재하는지 확인 (매우 중요!)
     if idx != n and m == mileage[idx]:
-        # idx = m보다 작은 원소 개수
-        # (n - idx - 1) = m보다 큰 원소 개수
-        print(idx * (n - idx - 1))
+        # ⭐ idx = m보다 작은 원소 개수
+        # ⭐ (n - idx - 1) = m보다 큰 원소 개수 (-1은 m 자신 제외)
+        print(idx * (n - idx - 1))  # ⭐⭐⭐ 핵심 공식!
     else:
-        print(0)
+        print(0)  # 🔴 m이 없으면 불가능
 ```
+
+### 🔴 출제 포인트
+| 위치 | 출제 예상 | 설명 |
+|------|-----------|------|
+| 🔴 `mileage.sort()` | **정렬** | bisect 사용 전제 |
+| ⭐⭐ `bisect.bisect_left` | **왼쪽 경계** | m보다 작은 개수 |
+| ⭐⭐⭐ `idx != n and m == mileage[idx]` | **존재 여부 확인** | 핵심 조건! |
+| ⭐⭐⭐ `idx * (n - idx - 1)` | **경우의 수 공식** | (작은 수) × (큰 수) |
+
+> 🔴 **핵심 암기**: 
+> - `bisect_left(arr, x)` = x보다 **작은** 원소 개수
+> - 중앙값 경우의 수 = **(작은 것 개수) × (큰 것 개수)**
+> - m 존재 확인: `idx != n and arr[idx] == m`
 
 ---
 
@@ -571,23 +657,25 @@ $$O(4^{N^2})$$ 최악, 실제로는 백트래킹으로 크게 감소
 def dfs(now, destIdx):
     global cnt
     
+    # ⭐ 현재 위치가 목적지인지 확인
     if now == dest[destIdx]:
-        if destIdx == m - 1:
+        if destIdx == m - 1:  # ⭐⭐ 마지막 목적지 도착!
             cnt += 1
             return
         else:
-            destIdx += 1
+            destIdx += 1  # ⭐ 다음 목적지로 전환
     
     x, y = now
-    visit[x][y] = True
+    visit[x][y] = True  # ⭐⭐ 방문 표시
     
     for i in range(4):
         nx, ny = x + dx[i], y + dy[i]
+        # ⭐ 범위 체크 & 미방문 & 빈 칸
         if 0 <= nx < n and 0 <= ny < n and \
            not visit[nx][ny] and grid[nx][ny] == 0:
             dfs([nx, ny], destIdx)
     
-    visit[x][y] = False
+    visit[x][y] = False  # ⭐⭐⭐ 백트래킹: 방문 해제!
 
 n, m = map(int, input().split())
 grid = [list(map(int, input().split())) for _ in range(n)]
@@ -595,27 +683,77 @@ grid = [list(map(int, input().split())) for _ in range(n)]
 dest = []
 for _ in range(m):
     x, y = map(int, input().split())
-    dest.append([x - 1, y - 1])
+    dest.append([x - 1, y - 1])  # ⭐ 1-indexed → 0-indexed
 
 visit = [[False] * n for _ in range(n)]
 cnt = 0
-dx, dy = [1, -1, 0, 0], [0, 0, 1, -1]
+dx, dy = [1, -1, 0, 0], [0, 0, 1, -1]  # 🔴 상하좌우
 
-dfs(dest[0], 1)
+dfs(dest[0], 1)  # ⭐⭐ 첫 목적지에서 시작, destIdx=1부터
 print(cnt)
 ```
 
+### 🔴 출제 포인트
+| 위치 | 출제 예상 | 설명 |
+|------|-----------|------|
+| ⭐⭐ `destIdx == m - 1` | **종료 조건** | 마지막 목적지 |
+| ⭐ `destIdx += 1` | **목적지 전환** | |
+| ⭐⭐ `visit[x][y] = True` | **방문 표시** | DFS 진입 시 |
+| ⭐⭐⭐ `visit[x][y] = False` | **백트래킹** | DFS 탈출 시 해제! |
+| ⭐ `[x - 1, y - 1]` | **좌표 변환** | 1-indexed → 0-indexed |
+| ⭐⭐ `dfs(dest[0], 1)` | **시작 조건** | 첫 목적지에서, 두 번째 목적지 향해 |
+
+> 🔴 **핵심 암기**: 
+> - 백트래킹 = **visit 해제** (`visit[x][y] = False`)
+> - 시작: `dfs(dest[0], 1)` → 첫 목적지에서 시작, destIdx=**1**부터
+> - 종료: `destIdx == m - 1` (0-indexed이므로)
+
 ---
 
-## 요약 표
+## 📝 전체 요약: 출제 예상 빈칸 TOP 10
 
-| 문제 | 알고리즘 | 시간복잡도 | 핵심 키워드 |
-|------|----------|------------|-------------|
-| **17** | 이분 탐색 | $O(N \log R)$ | 상향 이분탐색, 단조성 |
-| **18** | DP | $O(N^2)$ | 스택 정렬, 231 패턴 |
-| **19** | 시뮬레이션 | $O(h \cdot 2^h \cdot k)$ | 완전이진트리, merge |
-| **20** | 정렬 | $O(N \log N)$ | 등수 계산, 동점 처리 |
-| **21** | 비트마스크 DP | $O(3^n)$ | 부분집합 열거, 집합 분할 |
-| **22** | DFS | $O(N + M)$ | 역방향 그래프, 도달 가능성 |
-| **23** | 이진 탐색 | $O(N \log N + Q \log N)$ | bisect, 중앙값 |
-| **24** | 백트래킹 | $O(4^{N^2})$ | DFS, 방문 해제 |
+| 순위 | 문제 | 빈칸 내용 | 난이도 |
+|------|------|-----------|--------|
+| 1 | **17** | `(low + high + 1) // 2` | ⭐⭐⭐ |
+| 2 | **17** | `(x - a[i]) * (x - a[i])` | ⭐⭐ |
+| 3 | **22** | `adjR[y].append(x)` (역방향) | ⭐⭐⭐ |
+| 4 | **22** | `fromS[t] = 1` (T 차단) | ⭐⭐⭐ |
+| 5 | **23** | `idx * (n - idx - 1)` | ⭐⭐⭐ |
+| 6 | **24** | `visit[x][y] = False` (백트래킹) | ⭐⭐⭐ |
+| 7 | **21** | `(sub - 1) & index` (부분집합 열거) | ⭐⭐⭐ |
+| 8 | **19** | `r - h` (완료 업무 개수) | ⭐⭐ |
+| 9 | **18** | `total += more[i][k - 1]` | ⭐⭐ |
+| 10 | **20** | `cnt = i + 1` (동점 처리) | ⭐⭐ |
+
+---
+
+## 🔥 암기 필수 공식
+
+```python
+# 1. 상향 이분탐색 (최대값 찾기)
+mid = (low + high + 1) // 2
+if 조건: low = mid
+else: high = mid - 1
+
+# 2. 하향 이분탐색 (최소값 찾기)
+mid = (low + high) // 2
+if 조건: high = mid
+else: low = mid + 1
+
+# 3. 부분집합 열거
+sub = index
+while sub > 0:
+    # sub 처리
+    sub = (sub - 1) & index
+
+# 4. 역방향 그래프로 "v→X 도달 가능" 확인
+dfs(X, adjR, visited)  # 역방향에서 X부터 DFS
+
+# 5. 백트래킹
+visit[x][y] = True   # 진입
+dfs(...)
+visit[x][y] = False  # 탈출 시 해제
+
+# 6. 중앙값 경우의 수
+bisect_left(arr, m) * (n - bisect_left(arr, m) - 1)
+```
